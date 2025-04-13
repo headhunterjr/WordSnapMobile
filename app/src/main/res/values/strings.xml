@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">WordSnap</string>
+    <string name="wordsnap">WordSnap</string>
+    <string name="register">Реєстрація</string>
+    <string name="enter_username">Введіть ім\'я користувача</string>
+    <string name="enter_email">Введіть пошту</string>
+    <string name="create_password">Створіть пароль</string>
+    <string name="back">Назад</string>
+    <string name="login">Увійти</string>
+    <string name="search">Пошук</string>
+    <string name="enter_password">Введіть пароль</string>
+    <string name="create_acc">Бажаєте створити акаунт?</string>
+    <string name="fruits">fruits</string>
 </resources>

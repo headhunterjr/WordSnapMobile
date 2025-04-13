@@ -6,6 +6,8 @@ import android.util.Log
 import java.time.LocalDateTime
 import kotlin.random.Random
 import com.example.wordsnap.auth.PasswordHelper
+import com.example.wordsnap.entities.Cardset
+import com.example.wordsnap.entities.User
 
 class DatabaseManager(context: Context) {
     private val dbHelper: DatabaseHelper = DatabaseHelper(context)
@@ -220,5 +222,76 @@ class DatabaseManager(context: Context) {
         } else {
             false
         }
+    }
+    fun getRandomPublicCardsets(limit: Int): List<Cardset> {
+        val db = dbHelper.readableDatabase
+        val list = mutableListOf<Cardset>()
+
+        val sql = """
+        SELECT * FROM CardSets
+        WHERE is_public = 1
+        ORDER BY RANDOM()
+        LIMIT ?
+    """.trimIndent()
+
+        val cursor = db.rawQuery(sql, arrayOf(limit.toString()))
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                val userRef = cursor.getInt(cursor.getColumnIndexOrThrow("user_ref"))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                val isPublic = cursor.getInt(cursor.getColumnIndexOrThrow("is_public")) == 1
+                val createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
+
+                val cardset = Cardset(
+                    id = id,
+                    userRef = userRef,
+                    name = name,
+                    isPublic = isPublic,
+                    createdAt = createdAt
+                )
+                list.add(cardset)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return list
+    }
+
+    fun searchPublicCardsets(searchQuery: String): List<Cardset> {
+        val db = dbHelper.readableDatabase
+        val list = mutableListOf<Cardset>()
+
+        // Using LIKE for partial match (case-insensitive).
+        // Or you could do a lower(...) comparison.
+        val sql = """
+        SELECT * FROM CardSets
+        WHERE is_public = 1
+          AND name LIKE '%' || ? || '%'
+        ORDER BY id DESC
+    """.trimIndent()
+
+        val cursor = db.rawQuery(sql, arrayOf(searchQuery))
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                val userRef = cursor.getInt(cursor.getColumnIndexOrThrow("user_ref"))
+                val name = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                val isPublic = cursor.getInt(cursor.getColumnIndexOrThrow("is_public")) == 1
+                val createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
+
+                val cardset = Cardset(
+                    id = id,
+                    userRef = userRef,
+                    name = name,
+                    isPublic = isPublic,
+                    createdAt = createdAt
+                )
+                list.add(cardset)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return list
     }
 }

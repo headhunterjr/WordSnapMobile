@@ -23,6 +23,7 @@ class LoginActivity : AppCompatActivity() {
         val editTextPassword = findViewById<EditText>(R.id.editTextPasswordLogin)
         val buttonLogin = findViewById<Button>(R.id.buttonLogin)
         val buttonGoToRegister = findViewById<Button>(R.id.buttonGoToRegister)
+        val buttonBackLogin = findViewById<Button>(R.id.buttonBackLogin)
 
         buttonLogin.setOnClickListener {
             val email = editTextEmail.text.toString().trim()
@@ -49,6 +50,10 @@ class LoginActivity : AppCompatActivity() {
 
         buttonGoToRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
+        }
+
+        buttonBackLogin.setOnClickListener {
+            finish()
         }
     }
 }
