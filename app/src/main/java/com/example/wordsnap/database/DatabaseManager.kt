@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import java.time.LocalDateTime
 import kotlin.random.Random
+import com.example.wordsnap.auth.PasswordHelper
 
 class DatabaseManager(context: Context) {
     private val dbHelper: DatabaseHelper = DatabaseHelper(context)
@@ -145,5 +146,79 @@ class DatabaseManager(context: Context) {
             }
         }
         db.close()
+    }
+    fun registerUser(name: String, email: String, password: String): Boolean {
+        val db = dbHelper.writableDatabase
+        // Check if user exists already
+        val cursor = db.rawQuery("SELECT * FROM Users WHERE email = ?", arrayOf(email))
+        val userExists = cursor.count > 0
+        cursor.close()
+        if (userExists) {
+            db.close()
+            return false
+        }
+        // Insert new user. Here we store the password in plain text for demo purposes.
+        // In a real application, you must securely hash & salt the password.
+        val values = ContentValues().apply {
+            put("name", name)
+            put("email", email)
+            put("password_hash", password)
+            put("password_salt", "dummySalt")  // Placeholder value
+            put("is_verified", 1) // Mark as verified for demonstration
+        }
+        val id = db.insert("Users", null, values)
+        db.close()
+        return id != -1L
+    }
+    fun getUserByEmail(email: String): User? {
+        val db = dbHelper.readableDatabase
+        var user: User? = null
+        val query = "SELECT * FROM Users WHERE email = ?"
+        val cursor = db.rawQuery(query, arrayOf(email))
+        if (cursor.moveToFirst()) {
+            user = User(
+                id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
+                name = cursor.getString(cursor.getColumnIndexOrThrow("name")),
+                email = cursor.getString(cursor.getColumnIndexOrThrow("email")),
+                passwordHash = cursor.getString(cursor.getColumnIndexOrThrow("password_hash")),
+                passwordSalt = cursor.getString(cursor.getColumnIndexOrThrow("password_salt")),
+                isVerified = cursor.getInt(cursor.getColumnIndexOrThrow("is_verified")),
+                createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
+            )
+        }
+        cursor.close()
+        db.close()
+        return user
+    }
+    fun registerUser(name: String, email: String, passwordHash: String, salt: String): Boolean {
+        val db = dbHelper.writableDatabase
+        // Check if user already exists
+        val cursor = db.rawQuery("SELECT * FROM Users WHERE email = ?", arrayOf(email))
+        if (cursor.count > 0) {
+            cursor.close()
+            db.close()
+            return false
+        }
+        cursor.close()
+
+        // Prepare values and insert.
+        val values = ContentValues().apply {
+            put("name", name)
+            put("email", email)
+            put("password_hash", passwordHash)
+            put("password_salt", salt)
+            put("is_verified", 1) // For demo, mark as verified.
+        }
+        val id = db.insert("Users", null, values)
+        db.close()
+        return id != -1L
+    }
+    fun loginUser(email: String, password: String): Boolean {
+        val user = getUserByEmail(email)
+        return if (user != null) {
+            PasswordHelper.verifyPassword(password, user.passwordHash, user.passwordSalt)
+        } else {
+            false
+        }
     }
 }
