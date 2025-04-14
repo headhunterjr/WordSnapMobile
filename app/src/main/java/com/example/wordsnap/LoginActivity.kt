@@ -6,8 +6,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.wordsnap.auth.PasswordHelper
-import com.example.wordsnap.database.DatabaseManager
+import com.example.domain.auth.PasswordHelper
+import com.example.domain.auth.UserSession
+import com.example.data.database.DatabaseManager
 
 class LoginActivity : AppCompatActivity() {
 
@@ -34,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
                 if (user != null) {
                     if (PasswordHelper.verifyPassword(password, user.passwordHash, user.passwordSalt)) {
                         Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
-                        // Navigate to the main page, i.e., your existing MainActivity.
+                        UserSession.login(user)
                         startActivity(Intent(this, MainActivity::class.java))
                         finish()
                     } else {

@@ -1,4 +1,4 @@
-package com.example.wordsnap.entities
+package com.example.data.entities
 
 data class User(
     val id: Long,

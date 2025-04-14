@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "WordSnap"
 include(":app")
- 
+include(":data")
+include(":domain")

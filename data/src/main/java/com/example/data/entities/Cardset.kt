@@ -1,4 +1,4 @@
-package com.example.wordsnap.entities
+package com.example.data.entities
 
 data class Cardset(
     val id: Int,

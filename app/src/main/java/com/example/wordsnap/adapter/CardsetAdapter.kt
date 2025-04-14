@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wordsnap.R
-import com.example.wordsnap.entities.Cardset
+import com.example.data.entities.Cardset
 
 class CardsetAdapter(
     private val cardsets: List<Cardset>,
@@ -19,7 +19,6 @@ class CardsetAdapter(
         fun bind(cardset: Cardset) {
             textViewCardsetName.text = cardset.name
 
-            // Handle clicks
             itemView.setOnClickListener {
                 onItemClick(cardset)
             }

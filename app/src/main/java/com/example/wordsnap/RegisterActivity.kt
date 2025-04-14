@@ -6,8 +6,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.wordsnap.auth.PasswordHelper
-import com.example.wordsnap.database.DatabaseManager
+import com.example.domain.auth.PasswordHelper
+import com.example.data.database.DatabaseManager
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -36,7 +36,6 @@ class RegisterActivity : AppCompatActivity() {
                 val success = dbManager.registerUser(name, email, passwordHash, salt)
                 if (success) {
                     Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
-                    // Optionally, automatically log the user in and open MainActivity.
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 } else {

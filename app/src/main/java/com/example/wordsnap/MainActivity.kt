@@ -8,8 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wordsnap.adapter.CardsetAdapter
-import com.example.wordsnap.entities.Cardset
-import com.example.wordsnap.database.DatabaseManager
+import com.example.data.entities.Cardset
+import com.example.data.database.DatabaseManager
+import com.example.domain.auth.UserSession
 
 class MainActivity : AppCompatActivity() {
     private lateinit var dbManager: DatabaseManager
@@ -24,33 +25,37 @@ class MainActivity : AppCompatActivity() {
 
         dbManager = DatabaseManager(this)
 
-        // Initialize views
         recyclerView = findViewById(R.id.recyclerViewCardsets)
         editTextSearch = findViewById(R.id.editTextSearch)
         buttonSearch = findViewById(R.id.buttonSearch)
         buttonLoginTop = findViewById(R.id.buttonLoginTop)
+        updateLoginButton()
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         val randomCardsets = dbManager.getRandomPublicCardsets(4)
         displayCardsets(randomCardsets)
 
-        // Search button logic
         buttonSearch.setOnClickListener {
             val query = editTextSearch.text.toString().trim()
             if (query.isNotEmpty()) {
                 val results = dbManager.searchPublicCardsets(query)
                 displayCardsets(results)
             } else {
-                // If the search bar is empty, maybe reload random
                 val randomAgain = dbManager.getRandomPublicCardsets(4)
                 displayCardsets(randomAgain)
             }
         }
 
-        // Login button logic
         buttonLoginTop.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
+            if (UserSession.isLoggedIn) {
+                UserSession.logout()
+                updateLoginButton()
+                recreate()
+            }
+            else {
+                startActivity(Intent(this, LoginActivity::class.java))
+            }
         }
     }
 
@@ -60,5 +65,13 @@ class MainActivity : AppCompatActivity() {
             // e.g. Toast.makeText(this, "Clicked: ${cardset.name}", Toast.LENGTH_SHORT).show()
         }
         recyclerView.adapter = adapter
+    }
+
+    private fun updateLoginButton() {
+        if (UserSession.isLoggedIn) {
+            buttonLoginTop.text = "Вийти"
+        } else {
+            buttonLoginTop.text = "Увійти"
+        }
     }
 }
