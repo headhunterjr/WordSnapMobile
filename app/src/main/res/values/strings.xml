@@ -13,4 +13,6 @@
     <string name="HomePage">Домашня сторінка</string>
     <string name="SavedPage">Збережені</string>
     <string name="MinePage">Мої набори</string>
+    <string name="SavedCardsets">Збережені набори</string>
+    <string name="MyCardsets">Мої набори</string>
 </resources>

@@ -7,11 +7,13 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.auth.PasswordHelper
+import com.example.domain.validation.ValidationService
 import com.example.data.database.DatabaseManager
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var dbManager: DatabaseManager
+    private val validationService = ValidationService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,19 +32,35 @@ class RegisterActivity : AppCompatActivity() {
             val email = editTextEmail.text.toString().trim()
             val password = editTextPassword.text.toString().trim()
 
-            if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-                val salt = PasswordHelper.generateSalt()
-                val passwordHash = PasswordHelper.hashPassword(password, salt)
-                val success = dbManager.registerUser(name, email, passwordHash, salt)
-                if (success) {
-                    Toast.makeText(this, "Реєстрацію успішно виконано", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
-                } else {
-                    Toast.makeText(this, "Користувач з цією поштою вже зареєстрований", Toast.LENGTH_SHORT).show()
-                }
+            val nameResult = validationService.validateUsername(name)
+            val emailResult = validationService.validateEmail(email)
+            val passwordResult = validationService.validatePassword(password)
+
+            if (!nameResult.isValid) {
+                Toast.makeText(this, nameResult.errorMessage, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!emailResult.isValid) {
+                Toast.makeText(this, emailResult.errorMessage, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!passwordResult.isValid) {
+                Toast.makeText(this, passwordResult.errorMessage, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val salt = PasswordHelper.generateSalt()
+            val passwordHash = PasswordHelper.hashPassword(password, salt)
+            val success = dbManager.registerUser(name, email, passwordHash, salt)
+
+            if (success) {
+                Toast.makeText(this, "Реєстрація успішна", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
             } else {
-                Toast.makeText(this, "Заповніть всі поля", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Користувач з такою поштою вже існує", Toast.LENGTH_SHORT).show()
             }
         }
 

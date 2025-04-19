@@ -13,9 +13,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val dbMgr = DatabaseManager(this)
-
-        dbMgr.printTableContents()
         setContentView(R.layout.activity_main)
 
         val nav = findViewById<BottomNavigationView>(R.id.bottom_nav)

@@ -18,7 +18,7 @@ class SavedFragment : Fragment(R.layout.fragment_cardset_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         repo = WordSnapRepositoryImplementation(requireContext())
-        view.findViewById<TextView>(R.id.textTitle).text = "Saved Cardsets"
+        view.findViewById<TextView>(R.id.textTitle).text = getString(R.string.SavedCardsets)
 
         val rv = view.findViewById<RecyclerView>(R.id.recyclerView)
         rv.layoutManager = GridLayoutManager(requireContext(), 1)
