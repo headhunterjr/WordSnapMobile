@@ -34,18 +34,18 @@ class LoginActivity : AppCompatActivity() {
                 val user = dbManager.getUserByEmail(email)
                 if (user != null) {
                     if (PasswordHelper.verifyPassword(password, user.passwordHash, user.passwordSalt)) {
-                        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Вхід успішно виконано", Toast.LENGTH_SHORT).show()
                         UserSession.login(user)
                         startActivity(Intent(this, MainActivity::class.java))
                         finish()
                     } else {
-                        Toast.makeText(this, "Invalid password", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Неправильний пароль", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    Toast.makeText(this, "User with this email does not exist", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Неправильна пошта", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Введіть пошту та пароль", Toast.LENGTH_SHORT).show()
             }
         }
 

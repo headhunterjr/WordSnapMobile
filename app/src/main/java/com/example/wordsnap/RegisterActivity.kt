@@ -35,14 +35,14 @@ class RegisterActivity : AppCompatActivity() {
                 val passwordHash = PasswordHelper.hashPassword(password, salt)
                 val success = dbManager.registerUser(name, email, passwordHash, salt)
                 if (success) {
-                    Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Реєстрацію успішно виконано", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 } else {
-                    Toast.makeText(this, "User with this email already exists", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Користувач з цією поштою вже зареєстрований", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Заповніть всі поля", Toast.LENGTH_SHORT).show()
             }
         }
 

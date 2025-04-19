@@ -10,4 +10,7 @@
     <string name="enter_password">Введіть пароль</string>
     <string name="create_acc">Бажаєте створити акаунт?</string>
     <string name="fruits">fruits</string>
+    <string name="HomePage">Домашня сторінка</string>
+    <string name="SavedPage">Збережені</string>
+    <string name="MinePage">Мої набори</string>
 </resources>

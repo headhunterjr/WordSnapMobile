@@ -149,6 +149,7 @@ class DatabaseManager(context: Context) {
         }
         db.close()
     }
+
     fun getUserByEmail(email: String): User? {
         val db = dbHelper.readableDatabase
         var user: User? = null
@@ -169,6 +170,7 @@ class DatabaseManager(context: Context) {
         db.close()
         return user
     }
+
     fun registerUser(name: String, email: String, passwordHash: String, salt: String): Boolean {
         val db = dbHelper.writableDatabase
         // Check if user already exists
@@ -191,6 +193,7 @@ class DatabaseManager(context: Context) {
         db.close()
         return id != -1L
     }
+
     fun getRandomPublicCardsets(limit: Int): List<Cardset> {
         val db = dbHelper.readableDatabase
         val list = mutableListOf<Cardset>()
@@ -262,4 +265,64 @@ class DatabaseManager(context: Context) {
         db.close()
         return list
     }
+
+    fun getUsersOwnCardsets(userId: Long): List<Cardset> {
+        val db = dbHelper.readableDatabase
+        val list = mutableListOf<Cardset>()
+        val sql = "SELECT * FROM CardSets WHERE user_ref = ?"
+        Log.d("DBQuery", "getUsersOwnCardsets SQL: $sql | args: [$userId]")
+        val cursor = db.rawQuery(sql, arrayOf(userId.toString()))
+        Log.d("DBQuery", "getUsersOwnCardsets Cursor.count = ${cursor.count}")
+        if (cursor.moveToFirst()) {
+            do {
+                val id       = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                val name     = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                val uref     = cursor.getInt(cursor.getColumnIndexOrThrow("user_ref"))
+                Log.d("DBQuery", "  own → id=$id, name=$name, user_ref=$uref")
+                list += Cardset(
+                    id        = id,
+                    userRef   = uref,
+                    name      = name,
+                    isPublic  = cursor.getInt(cursor.getColumnIndexOrThrow("is_public")) == 1,
+                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
+                )
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return list
+    }
+
+    fun getUsersCardsetsLibrary(userId: Long): List<Cardset> {
+        val db = dbHelper.readableDatabase
+        val list = mutableListOf<Cardset>()
+        val sql = """
+        SELECT cs.*
+          FROM CardSets cs
+          JOIN Progress p ON cs.id = p.cardset_ref
+         WHERE p.user_ref = ?
+    """.trimIndent()
+        Log.d("DBQuery", "getUsersCardsetsLibrary SQL: $sql | args: [$userId]")
+        val cursor = db.rawQuery(sql, arrayOf(userId.toString()))
+        Log.d("DBQuery", "getUsersCardsetsLibrary Cursor.count = ${cursor.count}")
+        if (cursor.moveToFirst()) {
+            do {
+                val id       = cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                val name     = cursor.getString(cursor.getColumnIndexOrThrow("name"))
+                val uref     = cursor.getInt(cursor.getColumnIndexOrThrow("user_ref"))
+                Log.d("DBQuery", "  saved → id=$id, name=$name, user_ref=$uref")
+                list += Cardset(
+                    id        = id,
+                    userRef   = uref,
+                    name      = name,
+                    isPublic  = cursor.getInt(cursor.getColumnIndexOrThrow("is_public")) == 1,
+                    createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
+                )
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return list
+    }
+
 }
