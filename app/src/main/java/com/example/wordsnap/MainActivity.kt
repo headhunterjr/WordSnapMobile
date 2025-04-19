@@ -3,7 +3,6 @@ package com.example.wordsnap
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.example.data.database.DatabaseManager
 import com.example.domain.auth.UserSession
 import com.example.wordsnap.ui.HomeFragment
 import com.example.wordsnap.ui.MineFragment

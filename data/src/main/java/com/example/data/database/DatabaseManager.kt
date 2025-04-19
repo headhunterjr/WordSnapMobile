@@ -1,5 +1,6 @@
 package com.example.data.database
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.util.Log
@@ -7,6 +8,7 @@ import java.time.LocalDateTime
 import kotlin.random.Random
 import com.example.data.entities.Cardset
 import com.example.data.entities.User
+import com.example.data.entities.Card
 
 class DatabaseManager(context: Context) {
     private val dbHelper: DatabaseHelper =
@@ -323,6 +325,53 @@ class DatabaseManager(context: Context) {
         cursor.close()
         db.close()
         return list
+    }
+
+    fun getCardsetById(cardsetId: Int): Cardset? {
+        val db = dbHelper.readableDatabase
+        var cardset: Cardset? = null
+
+        val query = "SELECT * FROM CardSets WHERE id = ?"
+        val cursor = db.rawQuery(query, arrayOf(cardsetId.toString()))
+
+        if (cursor.moveToFirst()) {
+            cardset = Cardset(
+                id = cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                userRef = cursor.getInt(cursor.getColumnIndexOrThrow("user_ref")),
+                name = cursor.getString(cursor.getColumnIndexOrThrow("name")),
+                isPublic = cursor.getInt(cursor.getColumnIndexOrThrow("is_public")) == 1,
+                createdAt = cursor.getString(cursor.getColumnIndexOrThrow("created_at"))
+            )
+        }
+
+        cursor.close()
+        db.close()
+        return cardset
+    }
+
+    @SuppressLint("Range")
+    fun getCardsForCardset(cardsetId: Int): List<Card> {
+        val cards = mutableListOf<Card>()
+        val db = dbHelper.readableDatabase
+
+        val cursor = db.rawQuery(
+            "SELECT id, cardset_ref, word_en, word_ua, note FROM Cards WHERE cardset_ref = ?",
+            arrayOf(cardsetId.toString())
+        )
+
+        cursor.use { c ->
+            while (c.moveToNext()) {
+                cards += Card(
+                    id         = c.getInt(c.getColumnIndexOrThrow("id")),
+                    cardsetRef = c.getInt(c.getColumnIndexOrThrow("cardset_ref")),
+                    wordEn     = c.getString(c.getColumnIndexOrThrow("word_en")),
+                    wordUa     = c.getString(c.getColumnIndexOrThrow("word_ua")),
+                    note       = c.getString(c.getColumnIndexOrThrow("note")) ?: ""                )
+            }
+        }
+
+        db.close()
+        return cards
     }
 
 }

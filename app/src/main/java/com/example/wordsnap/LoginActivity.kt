@@ -8,17 +8,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.auth.PasswordHelper
 import com.example.domain.auth.UserSession
-import com.example.data.database.DatabaseManager
+import com.example.domain.repository.WordSnapRepositoryImplementation
 
 class LoginActivity : AppCompatActivity() {
 
-    private lateinit var dbManager: DatabaseManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
-        dbManager = DatabaseManager(this)
+        var repo = WordSnapRepositoryImplementation(this)
 
         val editTextEmail = findViewById<EditText>(R.id.editTextEmailLogin)
         val editTextPassword = findViewById<EditText>(R.id.editTextPasswordLogin)
@@ -31,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
             val password = editTextPassword.text.toString().trim()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                val user = dbManager.getUserByEmail(email)
+                val user = repo.getUserByEmail(email)
                 if (user != null) {
                     if (PasswordHelper.verifyPassword(password, user.passwordHash, user.passwordSalt)) {
                         Toast.makeText(this, "Вхід успішно виконано", Toast.LENGTH_SHORT).show()

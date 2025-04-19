@@ -7,19 +7,18 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.auth.PasswordHelper
+import com.example.domain.repository.WordSnapRepositoryImplementation
 import com.example.domain.validation.ValidationService
-import com.example.data.database.DatabaseManager
 
 class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var dbManager: DatabaseManager
     private val validationService = ValidationService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        dbManager = DatabaseManager(this)
+        var repo = WordSnapRepositoryImplementation(this)
 
         val editTextName = findViewById<EditText>(R.id.editTextNameRegister)
         val editTextEmail = findViewById<EditText>(R.id.editTextEmailRegister)
@@ -53,7 +52,7 @@ class RegisterActivity : AppCompatActivity() {
 
             val salt = PasswordHelper.generateSalt()
             val passwordHash = PasswordHelper.hashPassword(password, salt)
-            val success = dbManager.registerUser(name, email, passwordHash, salt)
+            val success = repo.registerUser(name, email, passwordHash, salt)
 
             if (success) {
                 Toast.makeText(this, "Реєстрація успішна", Toast.LENGTH_SHORT).show()

@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/wordsnap/ui/SavedFragment.kt
 package com.example.wordsnap.ui
 
 import android.os.Bundle
@@ -29,6 +28,12 @@ class SavedFragment : Fragment(R.layout.fragment_cardset_list) {
         val list = repo.getSavedCardsets(uid)
         Log.d("SavedFragment", "Fetched ${list.size} saved cardsets: ${list.map { it.name }}")
 
-        rv.adapter = CardsetAdapter(list) { /* stub */ }
+        rv.adapter = CardsetAdapter(list) { cardset ->
+            val fragment = CardsetDetailFragment.newInstance(cardset.id)
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 }

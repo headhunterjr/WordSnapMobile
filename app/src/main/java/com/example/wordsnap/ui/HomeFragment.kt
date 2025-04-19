@@ -2,9 +2,11 @@ package com.example.wordsnap.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +14,8 @@ import com.example.wordsnap.R
 import com.example.wordsnap.adapter.CardsetAdapter
 import com.example.domain.repository.WordSnapRepositoryImplementation
 import com.example.wordsnap.LoginActivity
+import com.example.data.entities.Cardset
+import com.example.domain.auth.UserSession
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var repo: WordSnapRepositoryImplementation
@@ -19,17 +23,43 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         repo = WordSnapRepositoryImplementation(requireContext())
 
-        val btnLogin = view.findViewById<Button>(R.id.buttonLoginTop)
-        val etSearch = view.findViewById<EditText>(R.id.editTextSearch)
+        val btnLogin  = view.findViewById<Button>(R.id.buttonLoginTop)
+        val etSearch  = view.findViewById<EditText>(R.id.editTextSearch)
         val btnSearch = view.findViewById<Button>(R.id.buttonSearch)
-        val rv = view.findViewById<RecyclerView>(R.id.recyclerViewHome)
+        val rv        = view.findViewById<RecyclerView>(R.id.recyclerViewHome)
+
+        if (UserSession.isLoggedIn) {
+            btnLogin.text = "Вийти"
+            btnLogin.setOnClickListener {
+                UserSession.logout()
+                requireActivity().recreate()
+            }
+        } else {
+            btnLogin.text = "Увійти"
+            btnLogin.setOnClickListener {
+                startActivity(Intent(requireContext(), LoginActivity::class.java))
+            }
+        }
+
+        val openDetail: (Cardset) -> Unit = { cardset ->
+            val detail = repo.getCardsetById(cardset.id)
+            Log.d("HomeFragment", "→ attempting open for cardset.id=${cardset.id}")
+            val frag = CardsetDetailFragment.newInstance(cardset.id)
+            Log.d("HomeFragment", "   repo.getCardsetById returned: $detail")
+            if (detail == null) {
+                Toast.makeText(requireContext(),
+                    "Набір #${cardset.id} не знайдено!", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, frag)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
 
         rv.layoutManager = LinearLayoutManager(requireContext())
-        rv.adapter = CardsetAdapter(repo.getRandomPublicCardsets(4)) { /* stub */ }
-
-        btnLogin.setOnClickListener {
-            startActivity(Intent(requireContext(), LoginActivity::class.java))
-        }
+        rv.adapter = CardsetAdapter(repo.getRandomPublicCardsets(4), openDetail)
 
         btnSearch.setOnClickListener {
             val q = etSearch.text.toString().trim()
@@ -37,7 +67,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 repo.getRandomPublicCardsets(4)
             else
                 repo.searchPublicCardsets(q)
-            rv.adapter = CardsetAdapter(data) { /* stub */ }
+
+            rv.adapter = CardsetAdapter(data, openDetail)
         }
     }
 }
