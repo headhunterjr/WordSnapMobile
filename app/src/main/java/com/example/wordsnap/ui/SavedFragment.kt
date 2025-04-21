@@ -1,7 +1,6 @@
 package com.example.wordsnap.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -23,17 +22,19 @@ class SavedFragment : Fragment(R.layout.fragment_cardset_list) {
         rv.layoutManager = GridLayoutManager(requireContext(), 1)
 
         val uid = UserSession.userId ?: -1L
-        Log.d("SavedFragment", "Current userId = $uid")
 
         val list = repo.getSavedCardsets(uid)
-        Log.d("SavedFragment", "Fetched ${list.size} saved cardsets: ${list.map { it.name }}")
 
-        rv.adapter = CardsetAdapter(list) { cardset ->
-            val fragment = CardsetDetailFragment.newInstance(cardset.id)
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
-                .commit()
-        }
+        rv.adapter = CardsetAdapter(
+            cardsets   = list,
+            onItemClick = { cardset ->
+                val fragment = CardsetDetailFragment.newInstance(cardset.id)
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        )
+
     }
 }

@@ -2,7 +2,6 @@ package com.example.wordsnap.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -43,9 +42,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         val openDetail: (Cardset) -> Unit = { cardset ->
             val detail = repo.getCardsetById(cardset.id)
-            Log.d("HomeFragment", "→ attempting open for cardset.id=${cardset.id}")
             val frag = CardsetDetailFragment.newInstance(cardset.id)
-            Log.d("HomeFragment", "   repo.getCardsetById returned: $detail")
             if (detail == null) {
                 Toast.makeText(requireContext(),
                     "Набір #${cardset.id} не знайдено!", Toast.LENGTH_SHORT).show()

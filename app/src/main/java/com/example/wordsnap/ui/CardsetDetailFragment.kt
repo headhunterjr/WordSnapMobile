@@ -2,6 +2,7 @@ package com.example.wordsnap.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -9,6 +10,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.wordsnap.R
 import com.example.wordsnap.adapter.CardAdapter
 import com.example.data.entities.Cardset
+import com.example.domain.auth.UserSession
 import com.example.domain.repository.WordSnapRepositoryImplementation
 
 class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
@@ -49,6 +51,20 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
             setupCardset(cardset)
         } else {
             requireActivity().supportFragmentManager.popBackStack()
+        }
+
+        val btnTest = view.findViewById<Button>(R.id.buttonTakeTest)
+        if (UserSession.isLoggedIn) {
+            btnTest.visibility = View.VISIBLE
+            btnTest.setOnClickListener {
+                val frag = TestFragment.newInstance(cardset!!.id)
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, frag)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        } else {
+            btnTest.visibility = View.GONE
         }
     }
 

@@ -12,6 +12,14 @@
     android:focusable="true"
     app:cardBackgroundColor="#EEEEEE">
 
+    <ImageView
+        android:id="@+id/imagePlus"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_add_circle"
+        android:visibility="gone"
+        app:tint="@color/light_gray" />
     <TextView
         android:id="@+id/textViewCardsetName"
         android:layout_width="match_parent"

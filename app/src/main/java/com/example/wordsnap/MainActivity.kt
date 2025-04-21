@@ -5,7 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.auth.UserSession
 import com.example.wordsnap.ui.HomeFragment
-import com.example.wordsnap.ui.MineFragment
+import com.example.wordsnap.ui.LibraryFragment
 import com.example.wordsnap.ui.SavedFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
             val frag = when (it.itemId) {
                 R.id.nav_home -> HomeFragment()
                 R.id.nav_saved -> SavedFragment()
-                R.id.nav_mine -> MineFragment()
+                R.id.nav_mine -> LibraryFragment()
                 else -> HomeFragment()
             }
             supportFragmentManager.beginTransaction()
@@ -32,7 +32,10 @@ class MainActivity : AppCompatActivity() {
                 .commit()
             true
         }
-        // default
         nav.selectedItemId = R.id.nav_home
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, HomeFragment())
+            .addToBackStack("HOME")
+            .commit()
     }
 }

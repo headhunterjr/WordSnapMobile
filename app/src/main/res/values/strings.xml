@@ -13,7 +13,14 @@
     <string name="HomePage">Домашня сторінка</string>
     <string name="SavedPage">Збережені</string>
     <string name="MinePage">Мої набори</string>
-    <string name="SavedCardsets">Збережені набори</string>
-    <string name="MyCardsets">Мої набори</string>
+    <string name="SavedCardsets">Збережені</string>
+    <string name="MyCardsets">Бібліотека</string>
     <string name="TakeTest">Пройти тест</string>
+    <string name="test_score_format">Вивчено слів:\n%1$d з %2$d</string>
+    <string name="Know">Знаю</string>
+    <string name="DoNotKnow">Не знаю</string>
+    <string name="_1_30">1/30</string>
+    <string name="WantToContinue">Бажаєте продовжити?</string>
+    <string name="Yes">Так!</string>
+    <string name="NoForNow">Поки ні</string>
 </resources>
