@@ -5,10 +5,24 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
+    <TextView
+        android:id="@+id/textViewAppTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/wordsnap"
+        android:textSize="24sp"
+        android:fontFamily="@font/pacifico_regular"
+        android:textColor="?attr/colorOnBackground"
+        android:layout_marginTop="-7dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="0dp"/>
+
     <ImageButton
         android:id="@+id/buttonBack"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="64dp"
         android:contentDescription="@string/back"
         android:src="@drawable/ic_arrow_back"
         android:background="?attr/selectableItemBackgroundBorderless"

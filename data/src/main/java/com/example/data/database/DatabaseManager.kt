@@ -373,18 +373,7 @@ class DatabaseManager(context: Context) {
         db.close()
         return cards
     }
-    fun addCardToSet(cardsetId: Int, wordEn: String, wordUa: String, note: String? = null): Long {
-        val db = dbHelper.writableDatabase
-        val values = ContentValues().apply {
-            put("cardset_ref", cardsetId)
-            put("word_en", wordEn)
-            put("word_ua", wordUa)
-            put("note", note)
-        }
-        val newId = db.insert("Cards", null, values)
-        db.close()
-        return newId
-    }
+
     fun userExists(username: String, email: String): Boolean {
         val db = dbHelper.readableDatabase
         val c = db.rawQuery(
