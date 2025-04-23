@@ -385,6 +385,168 @@ class DatabaseManager(context: Context) {
         db.close()
         return newId
     }
+    fun userExists(username: String, email: String): Boolean {
+        val db = dbHelper.readableDatabase
+        val c = db.rawQuery(
+            "SELECT 1 FROM Users WHERE name = ? OR email = ? LIMIT 1",
+            arrayOf(username, email)
+        )
+        val exists = c.count > 0
+        c.close(); db.close()
+        return exists
+    }
 
+    fun addUser(user: User): Int {
+        val db = dbHelper.writableDatabase
+        val v = ContentValues().apply {
+            put("name", user.name)
+            put("email", user.email)
+            put("password_hash", user.passwordHash)
+            put("password_salt", user.passwordSalt)
+            put("is_verified", user.isVerified)
+            put("created_at", user.createdAt)
+        }
+        val id = db.insert("Users", null, v).toInt()
+        db.close()
+        return id
+    }
+
+    fun addCardset(cs: Cardset): Int {
+        val db = dbHelper.writableDatabase
+        val v = ContentValues().apply {
+            put("user_ref", cs.userRef)
+            put("name", cs.name)
+            put("is_public", if (cs.isPublic) 1 else 0)
+            put("created_at", cs.createdAt)
+        }
+        val id = db.insert("CardSets", null, v).toInt()
+        db.close()
+        return id
+    }
+
+    fun updateCardset(cs: Cardset): Int {
+        val db = dbHelper.writableDatabase
+        val v = ContentValues().apply {
+            put("name", cs.name)
+            put("is_public", if (cs.isPublic) 1 else 0)
+        }
+        val count = db.update("CardSets", v, "id = ?", arrayOf(cs.id.toString()))
+        db.close()
+        return count
+    }
+
+    fun switchCardsetPrivacy(cardsetId: Int): Boolean {
+        val db = dbHelper.writableDatabase
+        db.execSQL(
+            "UPDATE CardSets SET is_public = 1 - is_public WHERE id = ?",
+            arrayOf(cardsetId)
+        )
+        db.close()
+        return true
+    }
+
+    fun deleteCardset(cardsetId: Int): Boolean {
+        val db = dbHelper.writableDatabase
+        val count = db.delete("CardSets", "id = ?", arrayOf(cardsetId.toString()))
+        db.close()
+        return count > 0
+    }
+
+    fun addCard(card: Card): Int {
+        val db = dbHelper.writableDatabase
+        val v = ContentValues().apply {
+            put("cardset_ref", card.cardsetRef)
+            put("word_en", card.wordEn)
+            put("word_ua", card.wordUa)
+            put("note", card.note)
+        }
+        val id = db.insert("Cards", null, v).toInt()
+        db.close()
+        return id
+    }
+
+    fun updateCard(card: Card): Int {
+        val db = dbHelper.writableDatabase
+        val v = ContentValues().apply {
+            put("word_en", card.wordEn)
+            put("word_ua", card.wordUa)
+            put("note", card.note)
+        }
+        val count = db.update("Cards", v, "id = ?", arrayOf(card.id.toString()))
+        db.close()
+        return count
+    }
+
+    fun deleteCard(cardId: Int): Boolean {
+        val db = dbHelper.writableDatabase
+        val count = db.delete("Cards", "id = ?", arrayOf(cardId.toString()))
+        db.close()
+        return count > 0
+    }
+
+    fun addTestProgress(userRef: Int, cardsetRef: Int, successRate: Double): Int {
+        val db = dbHelper.writableDatabase
+        val v = ContentValues().apply {
+            put("user_ref", userRef)
+            put("cardset_ref", cardsetRef)
+            put("success_rate", successRate)
+        }
+        val id = db.insert("Progress", null, v).toInt()
+        db.close()
+        return id
+    }
+
+    fun getProgress(userRef: Int, cardsetRef: Int): Double? {
+        val db = dbHelper.readableDatabase
+        val c = db.rawQuery(
+            "SELECT success_rate FROM Progress WHERE user_ref = ? AND cardset_ref = ?",
+            arrayOf(userRef.toString(), cardsetRef.toString())
+        )
+        val rate = if (c.moveToFirst()) c.getDouble(0) else null
+        c.close(); db.close()
+        return rate
+    }
+
+    fun updateProgress(userRef: Int, cardsetRef: Int, successRate: Double): Int {
+        val db = dbHelper.writableDatabase
+        val v = ContentValues().apply {
+            put("success_rate", successRate)
+        }
+        val count = db.update(
+            "Progress", v,
+            "user_ref = ? AND cardset_ref = ?",
+            arrayOf(userRef.toString(), cardsetRef.toString())
+        )
+        db.close()
+        return count
+    }
+
+    fun getCard(cardId: Int): Card? {
+        val db = dbHelper.readableDatabase
+        val c = db.rawQuery(
+            "SELECT id, cardset_ref, word_en, word_ua, note FROM Cards WHERE id = ?",
+            arrayOf(cardId.toString())
+        )
+        val card = if (c.moveToFirst()) Card(
+            id         = c.getInt(0),
+            cardsetRef = c.getInt(1),
+            wordEn     = c.getString(2),
+            wordUa     = c.getString(3),
+            note       = c.getString(4) ?: ""
+        ) else null
+        c.close(); db.close()
+        return card
+    }
+
+    fun isCardsetOwnedByUser(userId: Int, cardsetId: Int): Boolean {
+        val db = dbHelper.readableDatabase
+        val c = db.rawQuery(
+            "SELECT 1 FROM CardSets WHERE id = ? AND user_ref = ? LIMIT 1",
+            arrayOf(cardsetId.toString(), userId.toString())
+        )
+        val owned = c.count > 0
+        c.close(); db.close()
+        return owned
+    }
 
 }

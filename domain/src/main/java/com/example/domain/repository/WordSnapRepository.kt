@@ -14,5 +14,18 @@ interface WordSnapRepository {
     fun getCardsForCardset(cardsetId: Int): List<Card>
     fun getUserByEmail(email: String): User?
     fun registerUser(name: String, email: String, passwordHash: String, salt: String): Boolean
-
+    fun userExists(username: String, email: String): Boolean
+    fun addUser(user: User): Int
+    fun addCardset(cardset: Cardset): Int
+    fun updateCardset(cardset: Cardset): Int
+    fun switchCardsetPrivacy(cardsetId: Int): Boolean
+    fun deleteCardset(cardsetId: Int): Boolean
+    fun addCard(card: Card): Int
+    fun updateCard(card: Card): Int
+    fun deleteCard(cardId: Int): Boolean
+    fun addTestProgress(userRef: Int, cardsetRef: Int, successRate: Double): Int
+    fun getProgress(userRef: Int, cardsetRef: Int): Double?
+    fun updateProgress(userRef: Int, cardsetRef: Int, successRate: Double): Int
+    fun getCard(cardId: Int): Card?
+    fun isCardsetOwnedByUser(userId: Int, cardsetId: Int): Boolean
 }
