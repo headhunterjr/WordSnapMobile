@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
+import com.example.data.entities.Card
 import com.example.wordsnap.R
 import com.example.wordsnap.adapter.CardAdapter
 import com.example.data.entities.Cardset
@@ -69,10 +70,8 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
     }
 
     private fun setupCardset(cardset: Cardset) {
-        // Title
         cardsetTitle.text = cardset.name
 
-        // Owner check
         val isOwner = UserSession.userId == cardset.userRef.toLong()
         val btnEditSet   = requireView().findViewById<ImageButton>(R.id.buttonEditSet)
         val btnDeleteSet = requireView().findViewById<ImageButton>(R.id.buttonDeleteSet)
@@ -114,27 +113,25 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
             }
         }
 
-        // build and set your CardAdapter exactly once
         val cards = repo.getCardsForCardset(cardset.id)
         viewPager.adapter = CardAdapter(
-            cards       = cards,
-            isOwner     = isOwner,
-            onEditCard  = { card ->
+            cards = cards,
+            isOwner = isOwner,
+            onEditCard = { card ->
                 val dialogView = layoutInflater.inflate(R.layout.dialog_edit_card, null)
-                val etEn = dialogView.findViewById<EditText>(R.id.editTextWordEn)
-                val etUa = dialogView.findViewById<EditText>(R.id.editTextWordUa)
-                etEn.setText(card.wordEn)
-                etUa.setText(card.wordUa)
+                val editTextEn = dialogView.findViewById<EditText>(R.id.editTextWordEn)
+                val editTextUa = dialogView.findViewById<EditText>(R.id.editTextWordUa)
+                editTextEn.setText(card.wordEn)
+                editTextUa.setText(card.wordUa)
 
                 AlertDialog.Builder(requireContext())
                     .setTitle("Edit this card")
                     .setView(dialogView)
                     .setPositiveButton("Save") { _, _ ->
                         repo.updateCard(card.copy(
-                            wordEn = etEn.text.toString().trim(),
-                            wordUa = etUa.text.toString().trim()
+                            wordEn = editTextEn.text.toString().trim(),
+                            wordUa = editTextUa.text.toString().trim()
                         ))
-                        // refresh
                         setupCardset(repo.getCardsetById(cardset.id)!!)
                     }
                     .setNegativeButton("Cancel", null)
@@ -142,15 +139,35 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
             },
             onDeleteCard = { card ->
                 repo.deleteCard(card.id)
-                // just refresh the pager
                 setupCardset(repo.getCardsetById(cardset.id)!!)
             },
             onAddCard   = {
-                // stub for now
+                val dialogView = layoutInflater.inflate(R.layout.dialog_edit_card, null)
+                val editTextEn = dialogView.findViewById<EditText>(R.id.editTextWordEn)
+                val editTextUa = dialogView.findViewById<EditText>(R.id.editTextWordUa)
+
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Add New Card")
+                    .setView(dialogView)
+                    .setPositiveButton("Add") { _, _ ->
+                        val wordEn = editTextEn.text.toString().trim().takeIf(String::isNotEmpty)
+                            ?: return@setPositiveButton
+                        val wordUa = editTextUa.text.toString().trim().takeIf(String::isNotEmpty)
+                            ?: return@setPositiveButton
+                        repo.addCard(
+                            Card(
+                                id = 0,
+                                cardsetRef = cardset.id,
+                                wordEn = wordEn,
+                                wordUa = wordUa,
+                                note = ""
+                            )
+                        )
+                        setupCardset(repo.getCardsetById(cardset.id)!!)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
             }
         )
-
-        // no need to re-register the page-change callback every time
     }
-
 }

@@ -46,28 +46,28 @@ class CardAdapter(
         }
 
         fun bindRealCard(card: Card) {
-            front.visibility = View.VISIBLE
-            back .visibility = View.INVISIBLE
+            itemView.findViewById<View>(R.id.cardContainer).visibility = View.VISIBLE
+            itemView.findViewById<View>(R.id.addContainer).visibility   = View.GONE
             isFrontVisible   = true
             frontText.text = card.wordEn
-            backText .text = card.wordUa
+            backText.text = card.wordUa
             btnEdit.visibility   = if (isOwner) View.VISIBLE else View.GONE
             btnDelete.visibility = if (isOwner) View.VISIBLE else View.GONE
-            btnAdd.visibility    = View.GONE
 
             itemView.setOnClickListener { flipCard() }
-            btnEdit   .setOnClickListener { onEditCard(card) }
+            btnEdit.setOnClickListener { onEditCard(card) }
             btnDelete .setOnClickListener { onDeleteCard(card) }
         }
 
         fun bindAddStub() {
-            front.visibility = View.INVISIBLE
-            back .visibility = View.INVISIBLE
-            btnEdit   .visibility = View.GONE
-            btnDelete .visibility = View.GONE
+            val cardContainer = itemView.findViewById<View>(R.id.cardContainer)
+            val addContainer = itemView.findViewById<View>(R.id.addContainer)
 
-            btnAdd.visibility = View.VISIBLE
-            btnAdd.setOnClickListener { onAddCard() }
+            cardContainer.visibility = View.GONE
+            addContainer.visibility = View.VISIBLE
+
+            addContainer.findViewById<ImageButton>(R.id.buttonAddCard)
+                .setOnClickListener { onAddCard() }
         }
 
         private fun flipCard() {
