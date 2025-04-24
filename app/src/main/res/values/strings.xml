@@ -23,4 +23,5 @@
     <string name="WantToContinue">Бажаєте продовжити?</string>
     <string name="Yes">Так!</string>
     <string name="NoForNow">Поки ні</string>
+    <string name="addCard">Додати картку</string>
 </resources>
