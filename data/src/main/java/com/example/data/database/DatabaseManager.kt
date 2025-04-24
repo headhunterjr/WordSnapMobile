@@ -454,6 +454,14 @@ class DatabaseManager(context: Context) {
         return id
     }
 
+    fun updateCardsetName(cardsetId: Int, newName: String): Int {
+        val db = dbHelper.writableDatabase
+        val cv = ContentValues().apply { put("name", newName) }
+        val count = db.update("CardSets", cv, "id = ?", arrayOf(cardsetId.toString()))
+        db.close()
+        return count
+    }
+
     fun updateCard(card: Card): Int {
         val db = dbHelper.writableDatabase
         val v = ContentValues().apply {

@@ -24,4 +24,8 @@
     <string name="Yes">Так!</string>
     <string name="NoForNow">Поки ні</string>
     <string name="addCard">Додати картку</string>
+    <string name="edit_cardset">Редагувати набір</string>
+    <string name="delete_cardset">Видалити набір</string>
+    <string name="enter_eng_word">Введіть слово англійською</string>
+    <string name="enter_ua_word">Введіть слово українською</string>
 </resources>

@@ -1,8 +1,12 @@
 package com.example.wordsnap.ui
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -46,18 +50,14 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
         cardsetTitle = view.findViewById(R.id.textViewCardsetTitle)
         viewPager = view.findViewById(R.id.viewPagerCards)
 
-        val cardset = repo.getCardsetById(cardsetId)
-        if (cardset != null) {
-            setupCardset(cardset)
-        } else {
-            requireActivity().supportFragmentManager.popBackStack()
-        }
+        val cardset = repo.getCardsetById(cardsetId)!!
+        setupCardset(cardset)
 
         val btnTest = view.findViewById<Button>(R.id.buttonTakeTest)
         if (UserSession.isLoggedIn) {
             btnTest.visibility = View.VISIBLE
             btnTest.setOnClickListener {
-                val frag = TestFragment.newInstance(cardset!!.id)
+                val frag = TestFragment.newInstance(cardset.id)
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, frag)
                     .addToBackStack(null)
@@ -69,17 +69,88 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
     }
 
     private fun setupCardset(cardset: Cardset) {
+        // Title
         cardsetTitle.text = cardset.name
 
-        val cards = repo.getCardsForCardset(cardset.id)
+        // Owner check
+        val isOwner = UserSession.userId == cardset.userRef.toLong()
+        val btnEditSet   = requireView().findViewById<ImageButton>(R.id.buttonEditSet)
+        val btnDeleteSet = requireView().findViewById<ImageButton>(R.id.buttonDeleteSet)
 
-        val adapter = CardAdapter(cards)
-        viewPager.adapter = adapter
+        btnEditSet.visibility   = if (isOwner) View.VISIBLE else View.GONE
+        btnDeleteSet.visibility = if (isOwner) View.VISIBLE else View.GONE
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
+        if (isOwner) {
+            btnEditSet.setOnClickListener {
+                val et = EditText(requireContext()).apply {
+                    setText(cardset.name)
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                }
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Rename this set")
+                    .setView(et)
+                    .setPositiveButton("Save") { _, _ ->
+                        val newName = et.text.toString().trim()
+                        repo.updateCardsetName(cardset.id, newName)
+                        cardsetTitle.text = newName
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
             }
-        })
+
+            btnDeleteSet.setOnClickListener {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Delete this set?")
+                    .setMessage("This will remove the entire cardset.")
+                    .setPositiveButton("Delete") { _, _ ->
+                        repo.deleteCardset(cardset.id)
+                        requireActivity().supportFragmentManager.popBackStack()
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            }
+        }
+
+        // build and set your CardAdapter exactly once
+        val cards = repo.getCardsForCardset(cardset.id)
+        viewPager.adapter = CardAdapter(
+            cards       = cards,
+            isOwner     = isOwner,
+            onEditCard  = { card ->
+                val dialogView = layoutInflater.inflate(R.layout.dialog_edit_card, null)
+                val etEn = dialogView.findViewById<EditText>(R.id.editTextWordEn)
+                val etUa = dialogView.findViewById<EditText>(R.id.editTextWordUa)
+                etEn.setText(card.wordEn)
+                etUa.setText(card.wordUa)
+
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Edit this card")
+                    .setView(dialogView)
+                    .setPositiveButton("Save") { _, _ ->
+                        repo.updateCard(card.copy(
+                            wordEn = etEn.text.toString().trim(),
+                            wordUa = etUa.text.toString().trim()
+                        ))
+                        // refresh
+                        setupCardset(repo.getCardsetById(cardset.id)!!)
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
+            },
+            onDeleteCard = { card ->
+                repo.deleteCard(card.id)
+                // just refresh the pager
+                setupCardset(repo.getCardsetById(cardset.id)!!)
+            },
+            onAddCard   = {
+                // stub for now
+            }
+        )
+
+        // no need to re-register the page-change callback every time
     }
+
 }

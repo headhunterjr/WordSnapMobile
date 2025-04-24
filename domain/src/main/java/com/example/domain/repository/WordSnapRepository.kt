@@ -28,4 +28,5 @@ interface WordSnapRepository {
     fun updateProgress(userRef: Int, cardsetRef: Int, successRate: Double): Int
     fun getCard(cardId: Int): Card?
     fun isCardsetOwnedByUser(userId: Int, cardsetId: Int): Boolean
+    fun updateCardsetName(cardsetId: Int, newName: String): Int
 }
