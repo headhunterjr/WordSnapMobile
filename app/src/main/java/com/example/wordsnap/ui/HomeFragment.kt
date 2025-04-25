@@ -30,7 +30,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         if (UserSession.isLoggedIn) {
             btnLogin.text = "Вийти"
             btnLogin.setOnClickListener {
-                UserSession.logout()
+                UserSession.logout(requireContext())
                 requireActivity().recreate()
             }
         } else {

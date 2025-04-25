@@ -24,6 +24,7 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
     private lateinit var viewPager: ViewPager2
     private lateinit var cardsetTitle: TextView
     private var cardsetId: Int = -1
+    private lateinit var saveButton: ImageButton
 
     companion object {
         private const val ARG_CARDSET_ID = "cardset_id"
@@ -50,6 +51,7 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
 
         cardsetTitle = view.findViewById(R.id.textViewCardsetTitle)
         viewPager = view.findViewById(R.id.viewPagerCards)
+        saveButton = view.findViewById(R.id.buttonSaveCardset)
 
         val cardset = repo.getCardsetById(cardsetId)!!
         setupCardset(cardset)
@@ -64,8 +66,53 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
                     .addToBackStack(null)
                     .commit()
             }
+
+            // Setup save button only for logged in users
+            setupSaveButton(cardset)
         } else {
             btnTest.visibility = View.GONE
+            saveButton.visibility = View.GONE
+        }
+    }
+
+    private fun setupSaveButton(cardset: Cardset) {
+        // Only show save button if the user is not the owner
+        if (UserSession.userId == cardset.userRef.toLong()) {
+            saveButton.visibility = View.GONE
+            return
+        }
+
+        saveButton.visibility = View.VISIBLE
+        updateSaveButtonState()
+
+        saveButton.setOnClickListener {
+            val userId = UserSession.userId!!
+            val isInLibrary = repo.isCardsetInLibrary(userId, cardset.id)
+
+            if (isInLibrary) {
+                // Remove from library
+                repo.removeCardsetFromLibrary(userId, cardset.id)
+            } else {
+                // Add to library
+                repo.saveCardsetToLibrary(userId, cardset.id)
+            }
+
+            // Update button state
+            updateSaveButtonState()
+        }
+    }
+
+    private fun updateSaveButtonState() {
+        val isInLibrary = UserSession.userId?.let { repo.isCardsetInLibrary(it, cardsetId) }
+
+        if (isInLibrary == true) {
+            // Cardset is saved - show "bookmark filled" icon
+            saveButton.setImageResource(R.drawable.ic_bookmark_filled)
+            saveButton.contentDescription = getString(R.string.remove_from_library)
+        } else {
+            // Cardset is not saved - show "bookmark outline" icon
+            saveButton.setImageResource(R.drawable.ic_bookmark_outline)
+            saveButton.contentDescription = getString(R.string.add_to_library)
         }
     }
 
@@ -89,26 +136,26 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
                     )
                 }
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Rename this set")
+                    .setTitle("Змінити назву набору")
                     .setView(et)
-                    .setPositiveButton("Save") { _, _ ->
+                    .setPositiveButton("Зберегти") { _, _ ->
                         val newName = et.text.toString().trim()
                         repo.updateCardsetName(cardset.id, newName)
                         cardsetTitle.text = newName
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton("Назад", null)
                     .show()
             }
 
             btnDeleteSet.setOnClickListener {
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Delete this set?")
-                    .setMessage("This will remove the entire cardset.")
-                    .setPositiveButton("Delete") { _, _ ->
+                    .setTitle("Видалити цей набір?")
+                    .setMessage("Ця дія є незворотною.")
+                    .setPositiveButton("Видалити") { _, _ ->
                         repo.deleteCardset(cardset.id)
                         requireActivity().supportFragmentManager.popBackStack()
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton("Назад", null)
                     .show()
             }
         }
@@ -121,51 +168,58 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
                 val dialogView = layoutInflater.inflate(R.layout.dialog_edit_card, null)
                 val editTextEn = dialogView.findViewById<EditText>(R.id.editTextWordEn)
                 val editTextUa = dialogView.findViewById<EditText>(R.id.editTextWordUa)
+                val editTextNote = dialogView.findViewById<EditText>(R.id.editTextNote)
+
                 editTextEn.setText(card.wordEn)
                 editTextUa.setText(card.wordUa)
+                editTextNote.setText(card.note)
 
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Edit this card")
+                    .setTitle("Змінити картку")
                     .setView(dialogView)
-                    .setPositiveButton("Save") { _, _ ->
+                    .setPositiveButton("Зберегти") { _, _ ->
                         repo.updateCard(card.copy(
                             wordEn = editTextEn.text.toString().trim(),
-                            wordUa = editTextUa.text.toString().trim()
+                            wordUa = editTextUa.text.toString().trim(),
+                            note = editTextNote.text.toString().trim()
                         ))
                         setupCardset(repo.getCardsetById(cardset.id)!!)
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton("Назад", null)
                     .show()
             },
             onDeleteCard = { card ->
                 repo.deleteCard(card.id)
                 setupCardset(repo.getCardsetById(cardset.id)!!)
             },
-            onAddCard   = {
+            onAddCard = {
                 val dialogView = layoutInflater.inflate(R.layout.dialog_edit_card, null)
                 val editTextEn = dialogView.findViewById<EditText>(R.id.editTextWordEn)
                 val editTextUa = dialogView.findViewById<EditText>(R.id.editTextWordUa)
+                val editTextNote = dialogView.findViewById<EditText>(R.id.editTextNote)
 
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Add New Card")
+                    .setTitle("Додати нову картку")
                     .setView(dialogView)
-                    .setPositiveButton("Add") { _, _ ->
+                    .setPositiveButton("Додати") { _, _ ->
                         val wordEn = editTextEn.text.toString().trim().takeIf(String::isNotEmpty)
                             ?: return@setPositiveButton
                         val wordUa = editTextUa.text.toString().trim().takeIf(String::isNotEmpty)
                             ?: return@setPositiveButton
+                        val note = editTextNote.text.toString().trim()
+
                         repo.addCard(
                             Card(
                                 id = 0,
                                 cardsetRef = cardset.id,
                                 wordEn = wordEn,
                                 wordUa = wordUa,
-                                note = ""
+                                note = note
                             )
                         )
                         setupCardset(repo.getCardsetById(cardset.id)!!)
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton("Назад", null)
                     .show()
             }
         )

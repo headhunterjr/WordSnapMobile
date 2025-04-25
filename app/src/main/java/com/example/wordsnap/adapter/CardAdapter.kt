@@ -28,8 +28,13 @@ class CardAdapter(
         private val back = itemView.findViewById<View>(R.id.cardBackLayout)
         private val frontText = itemView.findViewById<TextView>(R.id.textViewCardFront)
         private val backText = itemView.findViewById<TextView>(R.id.textViewCardBack)
+        private val noteText  = itemView.findViewById<TextView>(R.id.textViewCardNote)
         private val btnEdit = itemView.findViewById<ImageButton>(R.id.buttonEditCard)
         private val btnDelete = itemView.findViewById<ImageButton>(R.id.buttonDeleteCard)
+        private val btnEditBack = itemView.findViewById<ImageButton>(R.id.buttonEditCardBack)
+        private val btnDeleteBack = itemView.findViewById<ImageButton>(R.id.buttonDeleteCardBack)
+        private val cardContainer = itemView.findViewById<View>(R.id.cardContainer)
+        private val addContainer = itemView.findViewById<View>(R.id.addContainer)
         private val btnAdd = itemView.findViewById<ImageButton>(R.id.buttonAddCard)
 
         private var isFrontVisible = true
@@ -42,39 +47,50 @@ class CardAdapter(
             val scale = itemView.context.resources.displayMetrics.density
             val distance = 8000 * scale
             front.cameraDistance = distance
-            back .cameraDistance = distance
+            back.cameraDistance = distance
         }
 
         fun bindRealCard(card: Card) {
-            itemView.findViewById<View>(R.id.cardContainer).visibility = View.VISIBLE
-            itemView.findViewById<View>(R.id.addContainer).visibility   = View.GONE
-            isFrontVisible   = true
+            cardContainer.visibility = View.VISIBLE
+            addContainer.visibility = View.GONE
+            isFrontVisible = true
             frontText.text = card.wordEn
             backText.text = card.wordUa
-            btnEdit.visibility   = if (isOwner) View.VISIBLE else View.GONE
-            btnDelete.visibility = if (isOwner) View.VISIBLE else View.GONE
+            if (card.note.isBlank()) {
+                noteText.visibility = View.GONE
+            } else {
+                noteText.visibility = View.VISIBLE
+                noteText.text       = card.note
+            }
+
+            val buttonsVisibility = if (isOwner) View.VISIBLE else View.GONE
+            btnEdit.visibility = buttonsVisibility
+            btnDelete.visibility = buttonsVisibility
+            btnEditBack.visibility = buttonsVisibility
+            btnDeleteBack.visibility = buttonsVisibility
 
             itemView.setOnClickListener { flipCard() }
-            btnEdit.setOnClickListener { onEditCard(card) }
-            btnDelete .setOnClickListener { onDeleteCard(card) }
+
+            val editClickListener = View.OnClickListener { onEditCard(card) }
+            val deleteClickListener = View.OnClickListener { onDeleteCard(card) }
+
+            btnEdit.setOnClickListener(editClickListener)
+            btnEditBack.setOnClickListener(editClickListener)
+            btnDelete.setOnClickListener(deleteClickListener)
+            btnDeleteBack.setOnClickListener(deleteClickListener)
         }
 
         fun bindAddStub() {
-            val cardContainer = itemView.findViewById<View>(R.id.cardContainer)
-            val addContainer = itemView.findViewById<View>(R.id.addContainer)
-
             cardContainer.visibility = View.GONE
             addContainer.visibility = View.VISIBLE
-
-            addContainer.findViewById<ImageButton>(R.id.buttonAddCard)
-                .setOnClickListener { onAddCard() }
+            btnAdd.setOnClickListener { onAddCard() }
         }
 
         private fun flipCard() {
             if (isFrontVisible) {
                 back.visibility = View.VISIBLE
                 frontAnim.setTarget(front)
-                backAnim .setTarget(back)
+                backAnim.setTarget(back)
                 frontAnim.addListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         front.visibility = View.INVISIBLE
@@ -85,7 +101,7 @@ class CardAdapter(
             } else {
                 front.visibility = View.VISIBLE
                 frontAnim.setTarget(back)
-                backAnim .setTarget(front)
+                backAnim.setTarget(front)
                 frontAnim.addListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         back.visibility = View.INVISIBLE

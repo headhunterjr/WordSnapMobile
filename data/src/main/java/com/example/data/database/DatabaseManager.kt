@@ -546,4 +546,39 @@ class DatabaseManager(context: Context) {
         return owned
     }
 
+    fun saveCardsetToLibrary(userId: Long, cardsetId: Int): Int {
+        val db = dbHelper.writableDatabase
+        val v = ContentValues().apply {
+            put("user_ref", userId)
+            put("cardset_ref", cardsetId)
+            put("success_rate", 0.0)
+        }
+        val id = db.insert("Progress", null, v).toInt()
+        db.close()
+        return id
+    }
+
+    fun removeCardsetFromLibrary(userId: Long, cardsetId: Int): Int {
+        val db = dbHelper.writableDatabase
+        val count = db.delete(
+            "Progress",
+            "user_ref = ? AND cardset_ref = ?",
+            arrayOf(userId.toString(), cardsetId.toString())
+        )
+        db.close()
+        return count
+    }
+
+    fun isCardsetInLibrary(userId: Long, cardsetId: Int): Boolean {
+        val db = dbHelper.readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT 1 FROM Progress WHERE user_ref = ? AND cardset_ref = ?",
+            arrayOf(userId.toString(), cardsetId.toString())
+        )
+        val exists = cursor.count > 0
+        cursor.close()
+        db.close()
+        return exists
+    }
+
 }

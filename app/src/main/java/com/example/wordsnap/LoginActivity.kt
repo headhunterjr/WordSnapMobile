@@ -33,7 +33,7 @@ class LoginActivity : AppCompatActivity() {
                 if (user != null) {
                     if (PasswordHelper.verifyPassword(password, user.passwordHash, user.passwordSalt)) {
                         Toast.makeText(this, "Вхід успішно виконано", Toast.LENGTH_SHORT).show()
-                        UserSession.login(user)
+                        UserSession.login(user, this)
                         startActivity(Intent(this, MainActivity::class.java))
                         finish()
                     } else {

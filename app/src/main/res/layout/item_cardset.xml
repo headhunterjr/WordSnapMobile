@@ -19,7 +19,7 @@
         android:layout_gravity="center"
         android:src="@drawable/ic_add_circle"
         android:visibility="gone"
-        app:tint="@color/light_gray" />
+        app:tint="@color/white" />
     <TextView
         android:id="@+id/textViewCardsetName"
         android:layout_width="match_parent"

@@ -5,7 +5,7 @@
         android:title="" />
     <item
         android:id="@+id/nav_saved"
-        android:icon="@drawable/ic_bookmark"
+        android:icon="@drawable/ic_bookmark_outline"
         android:title="" />
     <item
         android:id="@+id/nav_mine"

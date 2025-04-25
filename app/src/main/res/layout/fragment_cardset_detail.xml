@@ -7,7 +7,6 @@
     android:padding="16dp"
     android:paddingBottom="56dp">
 
-    <!-- WordSnap header up top -->
     <TextView
         android:id="@+id/textViewAppTitle"
         android:layout_width="wrap_content"
@@ -20,7 +19,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <!-- titleBar is now the sibling that holds your cardset name + edit/delete buttons -->
     <LinearLayout
         android:id="@+id/titleBar"
         android:layout_width="0dp"
@@ -31,7 +29,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Cardset name -->
         <TextView
             android:id="@+id/textViewCardsetTitle"
             android:layout_width="0dp"
@@ -40,7 +37,15 @@
             android:textSize="24sp"
             android:textStyle="bold"/>
 
-        <!-- Edit / Delete icons -->
+        <ImageButton
+            android:id="@+id/buttonSaveCardset"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_bookmark_outline"
+            android:contentDescription="@string/add_to_library"
+            android:visibility="gone"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
+
         <ImageButton
             android:id="@+id/buttonEditSet"
             android:layout_width="32dp"
@@ -60,7 +65,6 @@
             android:background="?attr/selectableItemBackgroundBorderless"/>
     </LinearLayout>
 
-    <!-- Now constrain your ViewPager below the titleBar -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPagerCards"
         android:layout_width="0dp"
@@ -72,7 +76,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Take Test button at the very bottom -->
     <Button
         android:id="@+id/buttonTakeTest"
         android:layout_width="0dp"

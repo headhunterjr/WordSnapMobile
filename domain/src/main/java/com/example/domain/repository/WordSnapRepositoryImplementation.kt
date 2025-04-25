@@ -53,6 +53,11 @@ class WordSnapRepositoryImplementation(context: Context) : WordSnapRepository {
 
     override fun isCardsetOwnedByUser(userId: Int, cardsetId: Int) = db.isCardsetOwnedByUser(userId, cardsetId)
 
-    override fun updateCardsetName(cardsetId: Int, newName: String) =
-        db.updateCardsetName(cardsetId, newName)
+    override fun updateCardsetName(cardsetId: Int, newName: String) = db.updateCardsetName(cardsetId, newName)
+
+    override fun saveCardsetToLibrary(userId: Long, cardsetId: Int) = db.saveCardsetToLibrary(userId, cardsetId)
+
+    override fun removeCardsetFromLibrary(userId: Long, cardsetId: Int) = db.removeCardsetFromLibrary(userId, cardsetId)
+
+    override fun isCardsetInLibrary(userId: Long, cardsetId: Int) = db.isCardsetInLibrary(userId, cardsetId)
 }

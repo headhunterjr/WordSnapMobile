@@ -29,4 +29,7 @@ interface WordSnapRepository {
     fun getCard(cardId: Int): Card?
     fun isCardsetOwnedByUser(userId: Int, cardsetId: Int): Boolean
     fun updateCardsetName(cardsetId: Int, newName: String): Int
+    fun saveCardsetToLibrary(userId: Long, cardsetId: Int): Int
+    fun removeCardsetFromLibrary(userId: Long, cardsetId: Int): Int
+    fun isCardsetInLibrary(userId: Long, cardsetId: Int): Boolean
 }

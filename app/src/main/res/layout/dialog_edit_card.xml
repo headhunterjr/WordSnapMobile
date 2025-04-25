@@ -18,5 +18,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/enter_ua_word"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/editTextNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_note"
+        android:inputType="text"
+        android:minLines="2"
+        android:gravity="top|start"/>
 </LinearLayout>
