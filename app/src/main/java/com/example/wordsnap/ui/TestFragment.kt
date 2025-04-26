@@ -8,10 +8,13 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.wordsnap.R
 import com.example.data.entities.Card
+import com.example.domain.auth.UserSession
 import com.example.domain.repository.WordSnapRepositoryImplementation
 
 class TestFragment : Fragment(R.layout.fragment_test) {
+    private lateinit var repo: WordSnapRepositoryImplementation
     private lateinit var cards: List<Card>
+    private var csId: Int = -1
     private var index = 0
     private var knownCount = 0
 
@@ -23,11 +26,16 @@ class TestFragment : Fragment(R.layout.fragment_test) {
     }
 
     override fun onViewCreated(v: View, savedInstanceState: Bundle?) {
-        val csId = requireArguments().getInt(ARG_CS_ID)
-        cards = WordSnapRepositoryImplementation(requireContext()).getCardsForCardset(csId)
+        repo = WordSnapRepositoryImplementation(requireContext())
+        csId = requireArguments().getInt(ARG_CS_ID)
+
+        cards = repo.getCardsForCardset(csId).shuffled()
+
         showCard(v)
+
         v.findViewById<Button>(R.id.buttonKnow).setOnClickListener {
-            knownCount++; nextOrFinish(v)
+            knownCount++
+            nextOrFinish(v)
         }
         v.findViewById<Button>(R.id.buttonDontKnow).setOnClickListener {
             nextOrFinish(v)
@@ -47,10 +55,32 @@ class TestFragment : Fragment(R.layout.fragment_test) {
         if (index < cards.size) {
             showCard(v)
         } else {
+            val newRate = knownCount.toDouble() / cards.size
+
+            val userId = UserSession.userId!!.toInt()
+            val oldRate = repo.getProgress(userId, csId)
+            val bestRate: Double
+            if (oldRate == null) {
+                repo.addTestProgress(userId, csId, newRate)
+                bestRate = newRate
+            } else if (newRate > oldRate) {
+                repo.updateProgress(userId, csId, newRate)
+                bestRate = newRate
+            } else {
+                bestRate = oldRate
+            }
+
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container,
-                    TestResultFragment.newInstance(knownCount, cards.size,
-                        requireArguments().getLong(ARG_CS_ID)))
+                .replace(
+                    R.id.fragment_container,
+                    TestResultFragment.newInstance(
+                        knownCount,
+                        cards.size,
+                        newRate,
+                        bestRate,
+                        csId
+                    )
+                )
                 .addToBackStack(null)
                 .commit()
         }

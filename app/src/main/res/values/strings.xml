@@ -35,4 +35,6 @@
     <string name="add_to_library">Додати до збережених</string>
     <string name="remove_from_library">Видалити зі збережених</string>
     <string name="private_set">Приватна</string>
+    <string name="new_score_percent_format">Новий результат: %1$.0f%%</string>
+    <string name="best_score_percent_format">Найкращий результат: %1$.0f%%</string>
 </resources>
