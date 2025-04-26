@@ -8,25 +8,14 @@
     android:padding="16dp"
     android:paddingBottom="56dp">
 
-    <TextView
-        android:id="@+id/textViewAppTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/wordsnap"
-        android:textSize="24sp"
-        android:layout_marginTop="-7dp"
-        android:fontFamily="@font/pacifico_regular"
-        android:textColor="?attr/colorOnBackground"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
     <FrameLayout
         android:id="@+id/titleRow"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/textViewAppTitle"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="36dp">
 
         <TextView
             android:id="@+id/textViewCardsetTitle"
