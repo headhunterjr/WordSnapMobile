@@ -34,4 +34,5 @@
     <string name="enter_note">Введіть нотатку</string>
     <string name="add_to_library">Додати до збережених</string>
     <string name="remove_from_library">Видалити зі збережених</string>
+    <string name="private_set">Приватна</string>
 </resources>

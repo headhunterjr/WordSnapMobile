@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,10 +23,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         repo = WordSnapRepositoryImplementation(requireContext())
 
-        val btnLogin  = view.findViewById<Button>(R.id.buttonLoginTop)
-        val etSearch  = view.findViewById<EditText>(R.id.editTextSearch)
-        val btnSearch = view.findViewById<Button>(R.id.buttonSearch)
-        val rv        = view.findViewById<RecyclerView>(R.id.recyclerViewHome)
+        val btnLogin = view.findViewById<Button>(R.id.buttonLoginTop)
+        val etSearch = view.findViewById<EditText>(R.id.editTextSearch)
+        val btnSearch = view.findViewById<ImageButton>(R.id.buttonSearch)
+        val rv = view.findViewById<RecyclerView>(R.id.recyclerViewHome)
 
         if (UserSession.isLoggedIn) {
             btnLogin.text = "Вийти"

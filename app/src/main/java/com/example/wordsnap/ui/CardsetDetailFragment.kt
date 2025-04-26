@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Switch
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -25,6 +26,8 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
     private lateinit var cardsetTitle: TextView
     private var cardsetId: Int = -1
     private lateinit var saveButton: ImageButton
+    private lateinit var privacyLabel: TextView
+    private lateinit var privacySwitch: Switch
 
     companion object {
         private const val ARG_CARDSET_ID = "cardset_id"
@@ -52,6 +55,8 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
         cardsetTitle = view.findViewById(R.id.textViewCardsetTitle)
         viewPager = view.findViewById(R.id.viewPagerCards)
         saveButton = view.findViewById(R.id.buttonSaveCardset)
+        privacyLabel  = view.findViewById(R.id.textViewPrivacyLabel)
+        privacySwitch = view.findViewById(R.id.switchPrivacy)
 
         val cardset = repo.getCardsetById(cardsetId)!!
         setupCardset(cardset)
@@ -67,7 +72,6 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
                     .commit()
             }
 
-            // Setup save button only for logged in users
             setupSaveButton(cardset)
         } else {
             btnTest.visibility = View.GONE
@@ -76,7 +80,6 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
     }
 
     private fun setupSaveButton(cardset: Cardset) {
-        // Only show save button if the user is not the owner
         if (UserSession.userId == cardset.userRef.toLong()) {
             saveButton.visibility = View.GONE
             return
@@ -90,14 +93,10 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
             val isInLibrary = repo.isCardsetInLibrary(userId, cardset.id)
 
             if (isInLibrary) {
-                // Remove from library
                 repo.removeCardsetFromLibrary(userId, cardset.id)
             } else {
-                // Add to library
                 repo.saveCardsetToLibrary(userId, cardset.id)
             }
-
-            // Update button state
             updateSaveButtonState()
         }
     }
@@ -106,11 +105,9 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
         val isInLibrary = UserSession.userId?.let { repo.isCardsetInLibrary(it, cardsetId) }
 
         if (isInLibrary == true) {
-            // Cardset is saved - show "bookmark filled" icon
             saveButton.setImageResource(R.drawable.ic_bookmark_filled)
             saveButton.contentDescription = getString(R.string.remove_from_library)
         } else {
-            // Cardset is not saved - show "bookmark outline" icon
             saveButton.setImageResource(R.drawable.ic_bookmark_outline)
             saveButton.contentDescription = getString(R.string.add_to_library)
         }
@@ -125,6 +122,9 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
 
         btnEditSet.visibility   = if (isOwner) View.VISIBLE else View.GONE
         btnDeleteSet.visibility = if (isOwner) View.VISIBLE else View.GONE
+        privacyLabel.visibility  = if (isOwner) View.VISIBLE else View.GONE
+        privacySwitch.visibility = if(isOwner) View.VISIBLE else View.GONE
+        privacySwitch.isChecked = !cardset.isPublic
 
         if (isOwner) {
             btnEditSet.setOnClickListener {
@@ -157,6 +157,12 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
                     }
                     .setNegativeButton("Назад", null)
                     .show()
+            }
+
+            privacySwitch.setOnCheckedChangeListener { _, isChecked ->
+                repo.switchCardsetPrivacy(cardset.id)
+                val updated = repo.getCardsetById(cardset.id)!!
+                privacySwitch.isChecked = !updated.isPublic
             }
         }
 

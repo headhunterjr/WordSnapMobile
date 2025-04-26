@@ -53,14 +53,20 @@ class CardAdapter(
         fun bindRealCard(card: Card) {
             cardContainer.visibility = View.VISIBLE
             addContainer.visibility = View.GONE
+
+            front.visibility = View.VISIBLE
+            back.visibility = View.INVISIBLE
+            front.rotationY = 0f
+            back.rotationY = 90f
             isFrontVisible = true
+
             frontText.text = card.wordEn
             backText.text = card.wordUa
             if (card.note.isBlank()) {
                 noteText.visibility = View.GONE
             } else {
                 noteText.visibility = View.VISIBLE
-                noteText.text       = card.note
+                noteText.text = card.note
             }
 
             val buttonsVisibility = if (isOwner) View.VISIBLE else View.GONE
