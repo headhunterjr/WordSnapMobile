@@ -295,8 +295,6 @@ class CardsetDetailFragment : Fragment(R.layout.fragment_cardset_detail) {
         val currentCard = cards[currentCardPosition]
         val isOwner = UserSession.userId == repo.getCardsetById(cardsetId)?.userRef?.toLong()
 
-        menu.setHeaderTitle("Опції для картки")
-
         menu.add(0, 1, 0, "Копіювати англійське слово")
         menu.add(0, 2, 0, "Копіювати український переклад")
 

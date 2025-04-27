@@ -107,9 +107,11 @@
 
     <Button
         android:id="@+id/buttonTakeTest"
-        android:layout_width="0dp"
+        android:background="@drawable/rounded_button_background"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:text="@string/TakeTest"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

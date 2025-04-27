@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.domain.auth.PasswordHelper
@@ -22,7 +23,7 @@ class LoginActivity : AppCompatActivity() {
         val editTextPassword = findViewById<EditText>(R.id.editTextPasswordLogin)
         val buttonLogin = findViewById<Button>(R.id.buttonLogin)
         val buttonGoToRegister = findViewById<Button>(R.id.buttonGoToRegister)
-        val buttonBackLogin = findViewById<Button>(R.id.buttonBackLogin)
+        val buttonBackLogin = findViewById<ImageButton>(R.id.buttonBackLogin)
 
         buttonLogin.setOnClickListener {
             val email = editTextEmail.text.toString().trim()
