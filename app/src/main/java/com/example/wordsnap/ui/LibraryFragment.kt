@@ -41,16 +41,16 @@ class LibraryFragment : Fragment(R.layout.fragment_cardset_list) {
             },
             onAddClick  = {
                 val et = EditText(requireContext()).apply {
-                    hint = "New set name"
+                    hint = "Назва набору"
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
                 }
                 AlertDialog.Builder(requireContext())
-                    .setTitle("Create Cardset")
+                    .setTitle("Створити набір")
                     .setView(et)
-                    .setPositiveButton("Create") { _, _ ->
+                    .setPositiveButton("Створити") { _, _ ->
                         val name = et.text.toString().trim().takeIf(String::isNotEmpty)
                             ?: return@setPositiveButton
                         val newId = repo.addCardset(
@@ -68,7 +68,7 @@ class LibraryFragment : Fragment(R.layout.fragment_cardset_list) {
                             .addToBackStack(null)
                             .commit()
                     }
-                    .setNegativeButton("Cancel", null)
+                    .setNegativeButton("Назад", null)
                     .show()
             }
         )

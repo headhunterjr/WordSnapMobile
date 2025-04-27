@@ -76,6 +76,7 @@ class CardAdapter(
             btnDeleteBack.visibility = buttonsVisibility
 
             itemView.setOnClickListener { flipCard() }
+            itemView.setOnLongClickListener { false }
 
             val editClickListener = View.OnClickListener { onEditCard(card) }
             val deleteClickListener = View.OnClickListener { onDeleteCard(card) }

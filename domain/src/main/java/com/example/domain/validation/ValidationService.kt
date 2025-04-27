@@ -46,4 +46,30 @@ class ValidationService {
         }
         return ValidationResult(true)
     }
+
+    fun validateEnglishWord(word: String): ValidationResult {
+        if (word.isBlank()) {
+            return ValidationResult(false, "Англійське слово не може бути порожнім.")
+        }
+
+        val regex = Regex("^[a-zA-Z\\s'-]+$")
+        if (!regex.matches(word)) {
+            return ValidationResult(false, "Англійське слово може містити лише літери латинського алфавіту, апострофи та дефіси.")
+        }
+
+        return ValidationResult(true)
+    }
+
+    fun validateUkrainianWord(word: String): ValidationResult {
+        if (word.isBlank()) {
+            return ValidationResult(false, "Українське слово не може бути порожнім.")
+        }
+
+        val regex = Regex("^[а-яА-ЯіІїЇєЄґҐ'\\s-]+$")
+        if (!regex.matches(word)) {
+            return ValidationResult(false, "Українське слово має містити лише символи українського алфавіту, апострофи та дефіси.")
+        }
+
+        return ValidationResult(true)
+    }
 }
